@@ -155,10 +155,10 @@ setup(
         "matplotlib",
         "scipy",
         "pandas",
-        "seaborn",
+        "seaborn>=0.9",
         "natsort",
         "argcomplete",
-        "colorama",
+        "colorama>=0.3",
         "pygments"
         #jupyter
     ] + (["enum34"] if python_below_34() else []),

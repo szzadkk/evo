@@ -54,12 +54,6 @@ def load_trajectories(args):
     else:
         raise KeyError("unknown sub-command: {}".format(args.subcommand))
 
-    if args.subcommand != "kitti":
-        logger.debug("Synchronizing trajectories...")
-        traj_ref, traj_est = sync.associate_trajectories(
-            traj_ref, traj_est, args.t_max_diff, args.t_offset,
-            first_name=ref_name, snd_name=est_name)
-
     return traj_ref, traj_est, ref_name, est_name
 
 
@@ -87,7 +81,7 @@ def get_pose_relation(args):
 
 def get_delta_unit(args):
     from evo.core.metrics import Unit
-    delta_unit = None
+    delta_unit = Unit.none
     if args.delta_unit == "f":
         delta_unit = Unit.frames
     elif args.delta_unit == "d":
@@ -125,8 +119,9 @@ def plot(args, result, traj_ref, traj_est):
     # Plot the values color-mapped onto the trajectory.
     fig2 = plt.figure(figsize=SETTINGS.plot_figsize)
     ax = plot.prepare_axis(fig2, plot_mode)
-    plot.traj(ax, plot_mode, traj_ref, '--', 'black', 'reference',
-              alpha=0.0 if SETTINGS.plot_hideref else 0.5)
+    plot.traj(ax, plot_mode, traj_ref, style=SETTINGS.plot_reference_linestyle,
+              color=SETTINGS.plot_reference_color, label='reference',
+              alpha=SETTINGS.plot_reference_alpha)
 
     if args.plot_colormap_min is None:
         args.plot_colormap_min = result.stats["min"]

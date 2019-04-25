@@ -71,9 +71,9 @@ def merge_json_union(first, second, soft=False):
         f_1.write(json.dumps(cfg_1, indent=4, sort_keys=True))
 
 
-def is_number(s):
+def is_number(token):
     try:
-        float(s)
+        float(token)
         return True
     except ValueError:
         return False
@@ -189,7 +189,7 @@ To save the configuration, specify -o / --output.
 def main():
     import argcomplete
     basic_desc = "crappy configuration tool"
-    lic = "(c) michael.grupp@tum.de"
+    lic = "(c) evo authors"
     shared_parser = argparse.ArgumentParser(add_help=False)
     shared_parser.add_argument("--no_color", help="don't color output",
                                action="store_true")
@@ -238,7 +238,7 @@ def main():
     argcomplete.autocomplete(main_parser)
     if len(sys.argv) > 1 and sys.argv[1] == "set":
         args, other_args = main_parser.parse_known_args()
-        other_args = [arg for arg in sys.argv[2:] if not arg.startswith('-')]
+        other_args = [arg for arg in sys.argv[2:]]
     else:
         args, other_args = main_parser.parse_known_args()
     log.configure_logging()

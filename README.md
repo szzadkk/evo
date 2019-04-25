@@ -2,19 +2,18 @@
 
 ***Python package for the evaluation of odometry and SLAM***
 
-| Linux / macOS | Windows |
-| :---: | :-----: |
-| [![Linux build Status](https://travis-ci.org/MichaelGrupp/evo.svg?branch=master)](https://travis-ci.org/MichaelGrupp/evo) | [![Windows build status](https://ci.appveyor.com/api/projects/status/usg1lqx59dqdqqal?svg=true)](https://ci.appveyor.com/project/MichaelGrupp/evo)
+| Linux / macOS / Windows / ROS |
+| :---: |
+| [![Build Status](https://dev.azure.com/michl2222/michl2222/_apis/build/status/MichaelGrupp.evo?branchName=master)](https://dev.azure.com/michl2222/michl2222/_build/latest?definitionId=1&branchName=master) |
 
-
-This packages provides executables and a small library for handling, evaluating and comparing the trajectory output of odometry and SLAM algorithms.
+This package provides executables and a small library for handling, evaluating and comparing the trajectory output of odometry and SLAM algorithms.
 
 Supported trajectory formats:
 
 * 'TUM' trajectory files
 * 'KITTI' pose files
 * 'EuRoC MAV' (.csv groundtruth and TUM trajectory file)
-* ROS bagfile with `geometry_msgs/PoseStamped`, `geometry_msgs/PoseWithCovarianceStamped` or `nav_msgs/Odometry` topics
+* ROS bagfile with `geometry_msgs/PoseStamped`, `geometry_msgs/TransformStamped`, `geometry_msgs/PoseWithCovarianceStamped` or `nav_msgs/Odometry` topics
 
 See [here](https://github.com/MichaelGrupp/evo/wiki/Formats) for more infos about the formats.
 

@@ -33,7 +33,7 @@ SEP = "-" * 80  # separator line
 def parser():
     import argparse
     basic_desc = "Relative pose error (RPE) metric app"
-    lic = "(c) michael.grupp@tum.de"
+    lic = "(c) evo authors"
 
     shared_parser = argparse.ArgumentParser(add_help=False)
     algo_opts = shared_parser.add_argument_group("algorithm options")
@@ -84,13 +84,20 @@ def parser():
         "--plot_colormap_max_percentile", type=float,
         help="percentile of the error distribution to be used "
         "as the upper bound of the color map plot "
-        "(in %%, overrides --plot_colormap_min)")
+        "(in %%, overrides --plot_colormap_max)")
+    output_opts.add_argument(
+        "--plot_full_ref",
+        action="store_true",
+        help="plot the full, unsynchronized reference trajectory",
+    )
     output_opts.add_argument("--save_plot", default=None,
                              help="path to save plot")
     output_opts.add_argument("--serialize_plot", default=None,
                              help="path to serialize plot (experimental)")
     output_opts.add_argument("--save_results",
                              help=".zip file path to store results")
+    output_opts.add_argument("--logfile", help="Local logfile path.",
+                             default=None)
     usability_opts.add_argument("--no_warnings", action="store_true",
                                 help="no warnings requiring user confirmation")
     usability_opts.add_argument("-v", "--verbose", action="store_true",
@@ -209,10 +216,12 @@ def rpe(traj_ref, traj_est, pose_relation, delta, delta_unit,
 
 def run(args):
     import evo.common_ape_rpe as common
+    from evo.core import sync
     from evo.tools import file_interface, log
     from evo.tools.settings import SETTINGS
 
-    log.configure_logging(args.verbose, args.silent, args.debug)
+    log.configure_logging(args.verbose, args.silent, args.debug,
+                          local_logfile=args.logfile)
     if args.debug:
         from pprint import pformat
         parser_str = pformat({arg: getattr(args, arg) for arg in vars(args)})
@@ -226,6 +235,17 @@ def run(args):
     traj_ref, traj_est, ref_name, est_name = common.load_trajectories(args)
     pose_relation = common.get_pose_relation(args)
     delta_unit = common.get_delta_unit(args)
+
+    traj_ref_full = None
+    if args.plot_full_ref:
+        import copy
+        traj_ref_full = copy.deepcopy(traj_ref)
+
+    if args.subcommand != "kitti":
+        logger.debug("Synchronizing trajectories...")
+        traj_ref, traj_est = sync.associate_trajectories(
+            traj_ref, traj_est, args.t_max_diff, args.t_offset,
+            first_name=ref_name, snd_name=est_name)
 
     result = rpe(
         traj_ref=traj_ref,
@@ -242,7 +262,8 @@ def run(args):
     )
 
     if args.plot or args.save_plot or args.serialize_plot:
-        common.plot(args, result, result.trajectories[ref_name],
+        common.plot(args, result,
+                    traj_ref_full if args.plot_full_ref else traj_ref,
                     result.trajectories[est_name])
 
     if args.save_results:
