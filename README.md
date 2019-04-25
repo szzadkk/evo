@@ -28,6 +28,10 @@ See [here](https://github.com/MichaelGrupp/evo/wiki/Formats) for more infos abou
 
 ---
 
+## ChangeLog
+- calculate trans_part error based on plot_mode. For example, if plot_mode == 'xy', the trans_part error is xy except z.
+
+
 ## Why?
 
 evo has several advantages over other public benchmarking tools:
