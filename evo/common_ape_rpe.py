@@ -70,8 +70,14 @@ def get_pose_relation(args):
         pose_relation = PoseRelation.full_transformation
     elif args.pose_relation == "rot_part":
         pose_relation = PoseRelation.rotation_part
-    elif args.pose_relation == "trans_part":
+    elif args.pose_relation == "trans_part" and args.plot_mode == "xyz":
         pose_relation = PoseRelation.translation_part
+    elif args.pose_relation == "trans_part" and (args.plot_mode == "xy" or args.plot_mode == "yx"):
+        pose_relation = PoseRelation.translation_part_xy
+    elif args.pose_relation == "trans_part" and (args.plot_mode == "yz" or args.plot_mode == "zy"):
+        pose_relation = PoseRelation.translation_part_yz
+    elif args.pose_relation == "trans_part" and (args.plot_mode == "xz" or args.plot_mode == "zx"):
+        pose_relation = PoseRelation.translation_part_xz
     elif args.pose_relation == "angle_deg":
         pose_relation = PoseRelation.rotation_angle_deg
     elif args.pose_relation == "angle_rad":

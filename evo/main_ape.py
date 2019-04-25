@@ -187,7 +187,6 @@ def run(args):
     import evo.common_ape_rpe as common
     from evo.tools import file_interface, log
     from evo.tools.settings import SETTINGS
-
     log.configure_logging(args.verbose, args.silent, args.debug)
     if args.debug:
         from pprint import pformat
@@ -195,6 +194,7 @@ def run(args):
         logger.debug("main_parser config:\n{}".format(parser_str))
     logger.debug(SEP)
 
+    
     traj_ref, traj_est, ref_name, est_name = common.load_trajectories(args)
     pose_relation = common.get_pose_relation(args)
 

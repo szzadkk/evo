@@ -60,7 +60,9 @@ class PoseRelation(Enum):
     rotation_part = "rotation part"
     rotation_angle_rad = "rotation angle in radians"
     rotation_angle_deg = "rotation angle in degrees"
-
+    translation_part_xy = "translation part xy"
+    translation_part_xz = "translation part xz"
+    translation_part_yz = "translation part yz"
 
 class Unit(Enum):
     meters = "m"
@@ -192,7 +194,7 @@ class RPE(PE):
         self.E = []
         self.error = []
         self.delta_ids = []
-        if pose_relation == PoseRelation.translation_part:
+        if pose_relation == PoseRelation.translation_part or pose_relation == PoseRelation.translation_part_xy or pose_relation == PoseRelation.translation_part_yz or pose_relation == PoseRelation.translation_part_xz:
             self.unit = Unit.meters
         elif pose_relation == PoseRelation.rotation_angle_deg:
             self.unit = Unit.degrees
@@ -279,6 +281,12 @@ class RPE(PE):
 
         if self.pose_relation == PoseRelation.translation_part:
             self.error = [np.linalg.norm(E_i[:3, 3]) for E_i in self.E]
+        elif self.pose_relation == PoseRelation.translation_part_xy:
+            self.error = [np.linalg.norm(E_i[:2, 3]) for E_i in self.E]
+        elif self.pose_relation == PoseRelation.translation_part_yz:
+            self.error = [np.linalg.norm(E_i[1:3, 3]) for E_i in self.E]
+        elif self.pose_relation == PoseRelation.translation_part_xz:
+            self.error = [np.sqrt(E_i[0,3]**2 + E_i[2,3]**2) for E_i in self.E]
         elif self.pose_relation == PoseRelation.rotation_part:
             # ideal: rot(E_i) = 3x3 identity
             self.error = np.array([
@@ -311,7 +319,7 @@ class APE(PE):
         self.pose_relation = pose_relation
         self.E = []
         self.error = []
-        if pose_relation == PoseRelation.translation_part:
+        if pose_relation == PoseRelation.translation_part or pose_relation == PoseRelation.translation_part_xy or pose_relation == PoseRelation.translation_part_xz or pose_relation == PoseRelation.translation_part_yz:
             self.unit = Unit.meters
         elif pose_relation == PoseRelation.rotation_angle_deg:
             self.unit = Unit.degrees
@@ -359,7 +367,7 @@ class APE(PE):
             raise MetricsException(
                 "trajectories must have same number of poses")
 
-        if self.pose_relation == PoseRelation.translation_part:
+        if self.pose_relation == PoseRelation.translation_part or self.pose_relation == PoseRelation.translation_part_xy or self.pose_relation == PoseRelation.translation_part_xz or self.pose_relation == PoseRelation.translation_part_yz:
             # don't require full SE(3) matrices for faster computation
             self.E = traj_est.positions_xyz - traj_ref.positions_xyz
         else:
@@ -374,6 +382,12 @@ class APE(PE):
         if self.pose_relation == PoseRelation.translation_part:
             # E is an array of position vectors only in this case
             self.error = [np.linalg.norm(E_i) for E_i in self.E]
+        elif self.pose_relation == PoseRelation.translation_part_xy:
+            self.error = [np.linalg.norm(E_i[0:2]) for E_i in self.E]
+        elif self.pose_relation == PoseRelation.translation_part_yz:
+            self.error = [np.linalg.norm(E_i[1:3]) for E_i in self.E]
+        elif self.pose_relation == PoseRelation.translation_part_xz:
+            self.error = [(np.sqrt(E_i[0]**2 + E_i[2]**2)) for E_i in self.E]
         elif self.pose_relation == PoseRelation.rotation_part:
             self.error = np.array([
                 np.linalg.norm(lie.so3_from_se3(E_i) - np.eye(3))
